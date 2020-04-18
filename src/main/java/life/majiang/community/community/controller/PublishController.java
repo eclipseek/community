@@ -63,14 +63,16 @@ public class PublishController {
         // 查询 cookie 中携带的 token --> 根据 token 查询用户信息 --> 将用户信息，设置到 session 中
         User user = null;
         Cookie[] cookies = request.getCookies();
-        for (Cookie cookie : cookies) {
-            if (cookie.getName().equals("token")) {
-                String token = cookie.getValue();
-                user = userMapper.findByToken(token);
-                if (Objects.nonNull(user)) {
-                    request.getSession().setAttribute("user", user);
+        if (!Objects.isNull(cookies)) {
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equals("token")) {
+                    String token = cookie.getValue();
+                    user = userMapper.findByToken(token);
+                    if (Objects.nonNull(user)) {
+                        request.getSession().setAttribute("user", user);
+                    }
+                    break;
                 }
-                break;
             }
         }
 

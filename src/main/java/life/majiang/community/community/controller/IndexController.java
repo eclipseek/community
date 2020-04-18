@@ -26,18 +26,20 @@ public class IndexController {
     public String hello(HttpServletRequest request) {
         // 从请求中获取 cookie 信息
         Cookie[] cookies = request.getCookies();
-        for (Cookie cookie : cookies) {
-            // 如果有 key 为 token 的 cookie
-            if (cookie.getName().equals("token")) {
-                String token = cookie.getValue();
-                // 根据 cookie 的值，去数据库查找对应的用户
-                User user = userMapper.findByToken(token);
-                // 找到用户了，说明可以保持用户逇登录态
-                if (Objects.nonNull(user)) {
-                    // 将用户信息，写入到 session 中
-                    request.getSession().setAttribute("user", user);
+        if (!Objects.isNull(cookies)) {
+            for (Cookie cookie : cookies) {
+                // 如果有 key 为 token 的 cookie
+                if (cookie.getName().equals("token")) {
+                    String token = cookie.getValue();
+                    // 根据 cookie 的值，去数据库查找对应的用户
+                    User user = userMapper.findByToken(token);
+                    // 找到用户了，说明可以保持用户逇登录态
+                    if (Objects.nonNull(user)) {
+                        // 将用户信息，写入到 session 中
+                        request.getSession().setAttribute("user", user);
+                    }
+                    break;
                 }
-                break;
             }
         }
 
