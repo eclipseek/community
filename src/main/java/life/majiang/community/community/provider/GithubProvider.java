@@ -7,6 +7,7 @@ import okhttp3.*;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Author: zhangyq<p>
@@ -26,7 +27,10 @@ public class GithubProvider {
                 .post(body)
                 .build();
 
-        OkHttpClient client = new OkHttpClient();
+        OkHttpClient client = new OkHttpClient().newBuilder()
+                .connectTimeout(30, TimeUnit.SECONDS)
+                .readTimeout(30, TimeUnit.SECONDS)
+                .build();
         try (Response response = client.newCall(request).execute()) {
             // str 格式是 access_token=18f3ae726ed442e46d9b7558d9c736d9c73dfb8b&scope=user&token_type=bearer
             String str = response.body().string();
@@ -41,14 +45,16 @@ public class GithubProvider {
 
     // 发送 get 请求到 github，获取用户信息
     public GithubUser getUser(String accessToken) {
-        OkHttpClient client = new OkHttpClient();
+        OkHttpClient client =  new OkHttpClient().newBuilder()
+                .connectTimeout(30, TimeUnit.SECONDS)
+                .readTimeout(30, TimeUnit.SECONDS)
+                .build();
         Request request = new Request.Builder()
                 .url("https://api.github.com/user?access_token=" + accessToken)
                 .build();
         try {
             Response response = client.newCall(request).execute();
             String userJson = response.body().string();
-            System.out.println("full user info: " + userJson);
             GithubUser user = JSON.parseObject(userJson, GithubUser.class);
             return user;
         } catch (IOException e) {
